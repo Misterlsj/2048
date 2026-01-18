@@ -1,8 +1,9 @@
-function GameManager(size, InputManager, Actuator, StorageManager) {
+function GameManager(size, InputManager, Actuator, StorageManager, SoundManager) {
   this.size           = size; // Size of the grid
   this.inputManager   = new InputManager;
   this.storageManager = new StorageManager;
   this.actuator       = new Actuator;
+  this.soundManager   = new SoundManager;
 
   this.startTiles     = 2;
 
@@ -138,6 +139,7 @@ GameManager.prototype.move = function (direction) {
   var vector     = this.getVector(direction);
   var traversals = this.buildTraversals(vector);
   var moved      = false;
+  var hasMerged  = false;
 
   // Save the current tile positions and remove merger information
   this.prepareTiles();
@@ -180,6 +182,12 @@ GameManager.prototype.move = function (direction) {
   });
 
   if (moved) {
+    if (hasMerged) {
+      this.soundManager.playMergeSound();
+    } else {
+      this.soundManager.playMoveSound();
+    }
+
     this.addRandomTile();
 
     if (!this.movesAvailable()) {
